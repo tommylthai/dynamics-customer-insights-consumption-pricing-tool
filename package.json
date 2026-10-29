@@ -1,0 +1,10 @@
+{
+  "name": "dynamics-customer-insights-consumption-pricing-tool",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone Dynamics 365 Customer Insights - Journeys agent credit planning calculator",
+  "scripts": {
+    "test": "node --test tests/calculator.test.cjs",
+    "start": "node server.cjs"
+  }
+}

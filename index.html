@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Estimate monthly Copilot Credit usage for the first-party Dynamics 365 Customer Insights - Journeys agents, with allocated capacity, pay-as-you-go and prepaid pack costs, and transparent workload assumptions.">
+  <meta name="color-scheme" content="light dark">
+  <title>Dynamics 365 Customer Insights - Journeys Agents Consumption Pricing Tool</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f3b66'/%3E%3Cpath d='M18 18h18l12 14-12 14H18l12-14z' fill='%239fcaff'/%3E%3C/svg%3E">
+  <script>
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const requested = params.get("scoutTheme") || params.get("theme");
+      const valid = value => value === "light" || value === "dark";
+      let saved = null;
+      try {
+        saved = localStorage.getItem("ci-journeys-agents-theme");
+      } catch (error) {
+        saved = null;
+      }
+      const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      document.documentElement.dataset.theme = valid(requested) ? requested : valid(saved) ? saved : preferred;
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="calculator.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#calculator">Skip to calculator</a>
+  <div class="disclaimer" role="note">
+    Non-binding informational estimate only. Confirm pricing, eligibility, and licensing terms with Microsoft or an authorized partner.
+  </div>
+
+  <main class="page">
+    <header class="hero">
+      <div>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span>Microsoft Dynamics 365 Customer Insights - Journeys</span>
+        </div>
+        <h1>Customer Insights - Journeys agents consumption pricing tool</h1>
+        <p class="lede">
+          Estimate monthly Copilot Credit usage for the first-party Customer Insights - Journeys agents, compare it with the capacity you allocate, and review the cost of any additional credits.
+        </p>
+      </div>
+      <div class="hero-actions">
+        <span class="verified">Sources verified: <time id="verified-short" datetime="2026-10-29">Oct 29, 2026</time></span>
+        <button class="button" id="reset" type="button">Reset estimate</button>
+        <button class="button" id="theme-toggle" type="button" aria-label="Switch theme">Switch theme</button>
+      </div>
+    </header>
+
+    <details class="how-to">
+      <summary>
+        <span class="how-to-heading">
+          <strong>Quick start: how to use this tool</strong>
+          <span>Size your marketing workload, shape each agent's usage, and review capacity and cost.</span>
+        </span>
+        <span class="how-to-toggle" aria-hidden="true"></span>
+      </summary>
+      <div class="how-to-content">
+        <h2 class="sr-only">How to use this tool</h2>
+        <div class="walkthrough-grid">
+          <article class="walkthrough-step">
+            <span class="step-number" aria-hidden="true">1</span>
+            <h3>Size your marketing workload</h3>
+            <p>Enter how many journeys you build and how many contacts enter journeys each month. These volumes drive agent usage, not license counts.</p>
+          </article>
+          <article class="walkthrough-step">
+            <span class="step-number" aria-hidden="true">2</span>
+            <h3>Shape agent workloads</h3>
+            <p>Include the agents you plan to use, then set adoption, activity volume, and credits per activity. Replace example rates with measured averages.</p>
+          </article>
+          <article class="walkthrough-step">
+            <span class="step-number" aria-hidden="true">3</span>
+            <h3>Review capacity and cost</h3>
+            <p>Compare buffered monthly credits with the capacity you allocate, then review pay-as-you-go and prepaid pack costs for any shortfall.</p>
+          </article>
+        </div>
+        <div class="example-panel">
+          <p class="example-flow"><strong>Example:</strong> <span id="example-flow">20 new journeys and 10,000 contacts entering journeys a month with 2 example agents = 39,500 credits/month, or 45,425 with a 15% buffer. Customer Insights includes no Copilot Credits and this example allocates none, so all 45,425 are additional credits: about $454.25 pay-as-you-go or 2 prepaid packs ($400.00) per month.</span> Rates are illustrative assumptions, not Microsoft prices.</p>
+          <a class="start-link" href="#calculator">Start your estimate</a>
+        </div>
+      </div>
+    </details>
+
+    <section class="intake-grid" aria-label="How Copilot usage is counted">
+      <article class="intake-card">
+        <h2>Included Copilot</h2>
+        <p>Copilot features such as segment query assist, email content ideas, content rewrite, and image recommendations aren't metered here. Microsoft documents Copilot Credit use only for the AI Hub agents. <a href="https://learn.microsoft.com/en-us/dynamics365/customer-insights/journeys/copilot-overview" target="_blank" rel="noopener noreferrer">Copilot features<span class="sr-only"> (opens in a new tab)</span> &nearr;</a></p>
+      </article>
+      <article class="intake-card">
+        <h2>Metered agents</h2>
+        <p>AI Hub lists two out-of-the-box agents that consume Copilot Credits: Journey Creation and Outreach Optimization. Both are in preview, so their behavior and metering can change.</p>
+      </article>
+      <article class="intake-card">
+        <h2>License capacity</h2>
+        <p>Customer Insights licenses include no Copilot Credits. Agents use Copilot Studio capacity allocated to the environment: prepaid packs, pay-as-you-go, or eligible Dynamics 365 Premium credits.</p>
+      </article>
+    </section>
+
+    <section class="notice" aria-labelledby="estimate-notice-title">
+      <strong id="estimate-notice-title">Important</strong>
+      <p>
+        Credits per activity are editable planning assumptions, not official Microsoft rates: Microsoft hasn't published per-activity rates for these preview agents. Replace them with measured averages, or clear a rate to mark that workload unpriced. License fees and taxes are excluded. Verify actual usage in the Power Platform admin center.
+      </p>
+    </section>
+
+    <div class="layout" id="calculator" tabindex="-1">
+      <div class="configuration">
+        <section class="panel workload-panel" aria-labelledby="workload-heading">
+          <div class="panel-heading">
+            <h2 id="workload-heading">Size your marketing workload</h2>
+            <p>Start with monthly journey and contact volumes. They drive agent usage; Customer Insights includes no Copilot Credits.</p>
+          </div>
+          <div class="team-grid">
+            <div class="field prominent">
+              <label for="journeys">New journeys per month</label>
+              <input id="journeys" type="number" inputmode="numeric" min="0" max="1000000" step="1" value="20" aria-describedby="journeys-help">
+              <small class="field-help" id="journeys-help">All journeys your team builds, whether or not they use the agent.</small>
+            </div>
+            <div class="field prominent">
+              <label for="contacts">Contacts entering journeys per month</label>
+              <input id="contacts" type="number" inputmode="numeric" min="0" max="1000000000" step="1" value="10000" aria-describedby="contacts-help">
+              <small class="field-help" id="contacts-help">Count a contact once per journey it enters. A planning driver, not your Interacted People quota.</small>
+            </div>
+          </div>
+          <div class="license-strip">
+            <span><strong id="license-credits">0</strong> Copilot Credits included with the Customer Insights tenant license</span>
+            <strong>Purchase or allocate capacity</strong>
+          </div>
+          <details class="advanced-settings">
+            <summary>Capacity available to this workload</summary>
+            <div class="advanced-content">
+              <div class="two-grid">
+                <div class="field">
+                  <label for="otherCapacity">Allocated monthly credits</label>
+                  <input id="otherCapacity" type="number" inputmode="numeric" min="0" step="1" value="0" aria-describedby="other-capacity-help">
+                  <small class="field-help" id="other-capacity-help">Credits from packs or eligible Dynamics 365 Premium licenses that this environment can use, net of other workloads.</small>
+                </div>
+              </div>
+              <p class="fine-print">Confirm capacity sources, eligibility, and environment allocation in the Power Platform admin center. Tenant capacity may already be used by other agents; don't count it twice. No automatic rollover is assumed.</p>
+            </div>
+          </details>
+        </section>
+
+        <section class="agents-section" aria-labelledby="agents-heading">
+          <div class="section-heading">
+            <div>
+              <h2 id="agents-heading">Build your agent mix</h2>
+              <p>Include each agent you plan to use, then tune its adoption, monthly volume, and assumed credits per activity.</p>
+            </div>
+            <div class="section-tools">
+              <span class="pill" id="enabled-count">2 of 2 included</span>
+              <button class="button" id="clear-rates" type="button">Clear all rates</button>
+            </div>
+          </div>
+          <div id="agent-cards" class="agent-grid"></div>
+        </section>
+      </div>
+
+      <aside class="summary-card" id="estimate-summary" aria-labelledby="summary-heading">
+        <h2 id="summary-heading">Monthly estimate</h2>
+        <div id="errors" class="error-box" hidden></div>
+        <div id="results">
+          <div class="credit-total">
+            <span id="estimate-kind" class="estimate-kind">Illustrative credit estimate</span>
+            <strong id="total-credits">39,500</strong>
+            <span>Copilot Credits per month, before buffer</span>
+          </div>
+          <p id="forecast-status" class="status-note"></p>
+          <div class="metric-grid">
+            <div class="metric">
+              <span>Buffer <span id="buffer-value"></span></span>
+              <strong id="buffer-credits"></strong>
+            </div>
+            <div class="metric">
+              <span>Planning capacity</span>
+              <strong id="planning"></strong>
+            </div>
+            <div class="metric">
+              <span>Included / allocated</span>
+              <strong id="included"></strong>
+            </div>
+            <div class="metric highlight">
+              <span id="additional-label">Additional credits</span>
+              <strong id="additional"></strong>
+            </div>
+          </div>
+          <div class="capacity-detail">
+            <div class="capacity-track" aria-hidden="true"><span id="capacity-fill"></span></div>
+            <p id="capacity-caption"></p>
+          </div>
+          <div class="metric-grid cost-grid">
+            <div class="metric">
+              <span>Pay as you go</span>
+              <strong id="payg-cost"></strong>
+              <small id="payg-basis"></small>
+            </div>
+            <div class="metric">
+              <span>Prepaid packs</span>
+              <strong id="pack-cost"></strong>
+              <small id="pack-count"></small>
+            </div>
+          </div>
+          <p id="pack-unused" class="fine-print"></p>
+          <div class="table-wrap">
+            <table class="breakdown">
+              <caption class="sr-only">Monthly Copilot Credits by included agent</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Agent</th>
+                  <th scope="col">Credits/mo.</th>
+                  <th scope="col">Share</th>
+                </tr>
+              </thead>
+              <tbody id="breakdown"></tbody>
+              <tfoot>
+                <tr>
+                  <th scope="row">Usage subtotal</th>
+                  <td id="subtotal"></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <details class="advanced-settings">
+          <summary>Buffer and list pricing</summary>
+          <div class="advanced-content">
+            <div class="two-grid">
+              <div class="field">
+                <label for="buffer">Planning buffer (%)</label>
+                <input id="buffer" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="15" aria-describedby="buffer-help">
+                <small class="field-help" id="buffer-help">Microsoft's estimator guidance suggests 10-20%.</small>
+              </div>
+              <div class="field">
+                <label for="paygRate">PAYG USD per credit</label>
+                <input id="paygRate" type="number" inputmode="decimal" min="0" max="1000" step="0.001" value="0.01" readonly aria-describedby="payg-rate-help">
+                <small class="field-help" id="payg-rate-help">Microsoft list price (fixed)</small>
+              </div>
+              <div class="field">
+                <label for="packSize">Credits per monthly pack</label>
+                <input id="packSize" type="number" inputmode="numeric" min="1" step="1" value="25000" readonly aria-describedby="pack-size-help">
+                <small class="field-help" id="pack-size-help">Microsoft pack size (fixed)</small>
+              </div>
+              <div class="field">
+                <label for="packPrice">USD per monthly pack</label>
+                <input id="packPrice" type="number" inputmode="decimal" min="0" step="0.01" value="200" readonly aria-describedby="pack-price-help">
+                <small class="field-help" id="pack-price-help">Microsoft list price (fixed)</small>
+              </div>
+            </div>
+            <p class="fine-print">Grayed-out prices are fixed to Microsoft's published USD list prices: $0.01 per credit, or $200 per 25,000-credit monthly pack. Confirm contract or regional pricing with Microsoft or an authorized partner. Pre-purchase plans, license fees, taxes, and other services are excluded.</p>
+          </div>
+        </details>
+        <div class="actions">
+          <button id="export" class="button primary" type="button">Download estimate</button>
+          <button id="print" class="button" type="button">Print</button>
+        </div>
+        <p class="privacy-note">Calculated in your browser. No sign-in, tracking, or data sent to a service. Only your theme choice is saved on this device.</p>
+        <p id="live-status" class="sr-only" role="status" aria-live="polite"></p>
+      </aside>
+    </div>
+
+    <details class="advanced-settings methodology">
+      <summary>Methodology and agent identity</summary>
+      <div class="advanced-content">
+        <article class="panel">
+          <h2>Calculation method</h2>
+          <ul>
+            <li>For each included agent: <strong>monthly driver &times; adoption % &times; activities per driver unit &times; assumed credits per activity</strong>. Journey Creation is driven by new journeys; Outreach Optimization by contacts entering journeys.</li>
+            <li>Fractional journeys, contacts, and activities represent expected averages; no intermediate rounding is applied.</li>
+            <li>The usage subtotal is buffered once, then rounded up once to a whole planning credit.</li>
+            <li>Customer Insights licenses include 0 Copilot Credits, so available capacity is only the credits you allocate. Additional credits never go below zero.</li>
+            <li>The prepaid comparison rounds additional credits up to whole packs. Buffer and pack rounding are budgeting choices, not Microsoft billing rules.</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h2>Agent identity and cautions</h2>
+          <ul>
+            <li><strong>Journey Creation Agent replaces Journey Copilot</strong> for journey creation. Count journey-building work once, under Journey Creation Agent.</li>
+            <li>Copilot features such as segment query assist, content ideas, content rewrite, and image recommendations aren't metered: Microsoft's Copilot overview doesn't document Copilot Credit use for them.</li>
+            <li>Out of scope: agents you build in Copilot Studio for conversational journeys, the Customer Insights MCP server, Customer Insights skills in Microsoft 365 Copilot, and Customer Insights - Data. Estimate those separately.</li>
+            <li>Both agents are in preview, so features and metering can change. Use per-agent consumption limits and monitor actual usage in the Power Platform admin center.</li>
+            <li>Included agents with activity but no rate are excluded from numeric totals and make the forecast incomplete.</li>
+          </ul>
+        </article>
+      </div>
+    </details>
+
+    <section class="panel sources" aria-labelledby="sources-heading">
+      <h2 id="sources-heading">Official Microsoft sources</h2>
+      <p>Primary Microsoft sources checked <time id="verified-long" datetime="2026-10-29">October 29, 2026</time>. They don't publish credits per activity for these agents.</p>
+      <ul id="source-list"></ul>
+      <p class="fine-print">
+        This independent tool is not affiliated with or endorsed by Microsoft. It provides a planning estimate, not an offer, quote, invoice, licensing determination, or legal advice.
+      </p>
+    </section>
+  </main>
+
+  <div class="mobile-total">
+    <div>
+      <span>Estimated monthly credits</span>
+      <strong id="mobile-total">39,500</strong>
+    </div>
+    <a href="#estimate-summary">View details</a>
+  </div>
+
+  <noscript><div class="noscript">JavaScript is required for the calculator. Enable JavaScript to calculate; displayed example placeholders are not a forecast.</div></noscript>
+</body>
+</html>
